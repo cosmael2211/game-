@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>game+ · Suivi & Rétrospective</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%2307140c'/%3E%3Cpath d='M22%2034H78C88%2034%2094%2042%2095%2054L97%2070C98%2078%2093%2084%2086%2084C80%2084%2077%2080%2074%2076L70%2070H30L26%2076C23%2080%2020%2084%2014%2084C7%2084%202%2078%203%2070L5%2054C6%2042%2012%2034%2022%2034ZM28%2046a6%206%200%201%200%200%2012a6%206%200%201%200%200-12ZM70%2044a4.5%204.5%200%201%200%200%209a4.5%204.5%200%201%200%200-9ZM80%2054a4.5%204.5%200%201%200%200%209a4.5%204.5%200%201%200%200-9Z' fill='%2322c55e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#09090b;--card:#121216;--c2:#1b1b21;--tx:#f5f6f8;--mu:#9b9ca8;--ac:#22c55e;--ac2:#4ade80;--bd:#26272f;--g1:#1a1a20;--g2:#0f0f13;color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f1f6f2;--card:#fff;--c2:#ebf3ee;--tx:#0d1117;--mu:#5c6b62;--ac:#22c55e;--ac2:#4ade80;--bd:#dbe7df;--g1:#fff;--g2:#f3f8f4;color-scheme:light}}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);overflow-x:hidden}
+body{margin:0 auto;background:radial-gradient(1000px 420px at 50% -140px,#22c55e26,transparent),var(--bg);background-attachment:fixed;color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:1000px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px calc(95px + env(safe-area-inset-bottom,0px));overflow-x:hidden;word-wrap:break-word}
+h1{font-size:21px;margin:0;background:linear-gradient(90deg,var(--tx),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;white-space:nowrap}
+h2{font-size:17px;margin:22px 0 10px;display:flex;align-items:center;gap:8px}h2:before{content:"";width:5px;height:18px;border-radius:3px;background:linear-gradient(var(--ac),var(--ac2));flex:none}h3{margin:0 0 4px}
+button,input,select,textarea{font:inherit;color:var(--tx);background:var(--c2);border:1px solid var(--bd);border-radius:12px;padding:8px 11px;max-width:100%}
+button{cursor:pointer;transition:opacity .15s,background .15s}
+button:active{opacity:.8}
+button.on,button.pri{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;border-color:transparent;font-weight:600}
+button.danger{background:#e74c3c22;color:#ff6b6b;border-color:#e74c3c55}
+button:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.mu{color:var(--mu);font-size:12px}.star{color:#f5a623}
+#nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--bd);padding:5px 4px calc(5px + env(safe-area-inset-bottom,0px));z-index:15}
+#nav button{flex:1;max-width:130px;border:0;background:none;font-size:10px;padding:5px 0;border-radius:12px;color:var(--mu)}#nav button span{display:block;font-size:19px;margin-bottom:2px}#nav button.on{background:none;color:var(--ac);font-weight:700}
+
+/* Grilles & Cartes */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}
+@media(max-width:380px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}}
+.rh{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.rh>.card{flex:none;width:142px;scroll-snap-align:start}
+.card{background:linear-gradient(180deg,var(--g1),var(--g2));border:1px solid var(--bd);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.card.x{cursor:pointer}
+.cov{height:195px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:32px;position:relative;overflow:hidden;background-size:cover!important;background-position:center!important;flex:none}
+.cov .ini{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.9;pointer-events:none}
+.cov img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cov small{position:absolute;top:7px;right:7px;font-size:10px;background:#000c;color:#fff;padding:3px 7px;border-radius:99px;font-weight:700;z-index:2;max-width:85%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cov em{position:absolute;top:7px;left:7px;font-style:normal;font-size:14px;z-index:2;filter:drop-shadow(0 1px 3px #000)}
+.cov .ov{position:absolute;left:0;right:0;bottom:0;padding:22px 9px 7px;background:linear-gradient(transparent,#000e);text-align:left;z-index:2;pointer-events:none}
+.big2{font-size:15px;font-weight:800;color:#fff;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bd{padding:9px;flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:4px}
+.bd b{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25}
+.bar{height:6px;background:var(--c2);border-radius:9px;overflow:hidden;margin:4px 0}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:9px}
+
+/* KPIs & Panels */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.kpi div{background:linear-gradient(180deg,var(--g1),var(--g2));border:1px solid var(--bd);border-radius:16px;display:flex;flex-direction:column-reverse;gap:4px;text-align:left;padding:12px 14px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--tx);overflow:hidden}
+.kpi b{color:var(--ac);font-size:26px;line-height:1.05;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.k4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:520px){.k4{grid-template-columns:repeat(2,1fr)}.kpi b{font-size:22px}}
+.panel{background:linear-gradient(180deg,var(--g1),var(--g2));border:1px solid var(--bd);border-radius:18px;padding:13px;margin-bottom:10px;overflow:hidden}
+
+/* Graphiques */
+.h{display:flex;align-items:center;gap:8px;font-size:12px;margin:6px 0}
+.h span:first-child{width:100px;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.h .bw{flex:1;min-width:20px;display:flex;align-items:center}
+.h i{display:block;height:11px;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:6px}
+.h span:last-child{flex:none;white-space:nowrap}
+.hist{display:flex;align-items:flex-end;gap:4px;height:100px;padding-bottom:18px}
+.hist div{flex:1;background:linear-gradient(var(--ac2),var(--ac));border-radius:5px 5px 0 0;position:relative;min-height:3px}
+.hist span{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:9px;color:var(--mu)}
+
+/* Modales & Formulaires */
+.mod{position:fixed;inset:0;background:#000c;backdrop-filter:blur(4px);z-index:30;overflow-y:auto;padding:14px;display:flex;align-items:flex-start;justify-content:center}
+.mod>div{width:100%;max-width:560px;margin:auto;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:16px;box-shadow:0 20px 50px #000a}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.f{grid-template-columns:1fr}.f .w{grid-column:1!important}}
+.f label{font-size:11px;font-weight:600;color:var(--mu);display:flex;flex-direction:column;gap:4px}
+.f .w{grid-column:1/3}
+.prev-img{width:80px;height:112px;border-radius:12px;background:var(--c2);border:1px solid var(--bd);object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;overflow:hidden}
+.prev-img img{width:100%;height:100%;object-fit:cover}
+
+/* Saisons box */
+.season-row{display:grid;grid-template-columns:1fr 100px 100px 36px;gap:6px;align-items:center;background:var(--c2);padding:8px;border-radius:12px;margin-bottom:6px}
+@media(max-width:480px){.season-row{grid-template-columns:1fr 80px 80px 32px}}
+.season-row .fl{grid-column:1/-1;font-size:12px;padding:6px 9px}
+
+/* Wrap & Story */
+.wrap{background:linear-gradient(135deg,#1b221d,#0f2a1a 60%,#22c55e88);border:1px solid var(--bd);color:#fff;border-radius:20px;padding:18px;margin:10px 0;overflow:hidden}
+.wrap b{font-size:26px;display:block;margin:4px 0}
+.pill{font-size:11px;padding:3px 9px;border-radius:99px;background:var(--c2);color:var(--mu);display:inline-block;white-space:nowrap}
+.ev{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}.ev:last-child{border:0}
+.ev .t{width:36px;height:50px;border-radius:8px;background-color:var(--c2);background-size:cover;background-position:center;flex:none;overflow:hidden;position:relative}
+.ev .t img{width:100%;height:100%;object-fit:cover;display:block}
+#toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,20px);background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;padding:10px 16px;border-radius:14px;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:90%;text-align:center;font-size:13px;font-weight:600}#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* Fullscreen Wrapped */
+#wr{position:fixed;inset:0;background:#000;z-index:50;display:none;align-items:center;justify-content:center}#wr.on{display:flex}
+.ws{position:relative;width:100%;max-width:430px;height:100%;max-height:840px;overflow:hidden;color:#fff;display:flex;flex-direction:column;background:#000}
+@media(min-width:500px){.ws{border-radius:26px;height:94vh}}
+.sl{position:absolute;inset:0;padding:86px 24px 96px;overflow-y:auto;color:#fff;display:flex;flex-direction:column;scrollbar-width:none}.sl::-webkit-scrollbar{display:none}
+.wp{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:16px;right:16px;display:flex;gap:6px;z-index:3}.wp i{flex:1;height:4px;border-radius:4px;background:#ffffff40}.wp i.d{background:#fff}
+.wx{position:absolute;top:calc(26px + env(safe-area-inset-top,0px));right:12px;z-index:4;background:none;border:0;color:#fff;border-radius:50%;width:36px;height:36px;font-size:22px;padding:0}
+.pp{animation:wi .6s ease both}@keyframes wi{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.wn{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:16px;right:16px;display:flex;gap:10px;z-index:5}
+.wn button{flex:1;padding:14px;border-radius:14px;border:0;font-weight:700;background:#ffffff26;backdrop-filter:blur(8px);color:#fff;font-size:15px}.wn button.nx{background:#fff;color:#14532d;flex:2}
+.kk2{font-weight:800;font-size:13px;letter-spacing:2.5px;text-transform:uppercase}
+.cd{font-family:Anton,Impact,"Arial Narrow Bold","Arial Narrow",sans-serif;font-weight:400;text-transform:uppercase;line-height:.96;word-break:break-word}
+.rk{display:flex;align-items:center;gap:12px;margin-bottom:14px}.sbx{border-radius:24px;padding:16px}
+.cell{aspect-ratio:1;border-radius:10px;border:1px solid #ffffff47;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.bar2{height:12px;background:#ffffff22;border-radius:9px;overflow:hidden}.bar2 i{display:block;height:100%;background:#22c55e;border-radius:9px}
+
+/* Calendrier */
+.cw{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cw .hd{text-align:center;font-size:11px;color:var(--mu);padding-bottom:2px}
+.dy{aspect-ratio:3/4;position:relative;border-radius:9px;overflow:hidden;background:var(--c2);color:var(--mu);font-size:11px;padding:4px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between}
+.dy img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.dy.e{cursor:default}.dy.w{color:#fff}.dy.w:before{content:"";position:absolute;inset:0;background:linear-gradient(#0008,transparent 45%,#000e);z-index:1}.dy>*:not(img){position:relative;z-index:2}
+.dy b{font-size:11px}.dy.w b{text-shadow:0 1px 3px #0009}.dy span{align-self:flex-end;font-weight:800;font-size:12px;text-shadow:0 1px 3px #000}
+.dy i{font-style:normal;position:absolute;top:3px;right:3px;background:#000c;border-radius:99px;padding:0 4px;font-size:9px;color:#fff;z-index:2}
+.dy.sel{outline:2px solid var(--ac2);outline-offset:1px}.dy.td b{color:var(--ac2)}.dy.w.td b{text-decoration:underline}
+.yg{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px}.ym{cursor:pointer;margin:0}
+.mg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}.mg i{aspect-ratio:1;border-radius:3px;background:var(--c2);display:block}.mg i.on{background:var(--ac)}
+:root[data-theme="light"]{--bg:#f1f6f2;--card:#fff;--c2:#ebf3ee;--tx:#0d1117;--mu:#5c6b62;--bd:#dbe7df;--g1:#fff;--g2:#f3f8f4;color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
+</style></head><body>
+
+<div class="row" style="gap:8px;margin-bottom:6px">
+  <span id="lgo" style="display:flex;flex:none"></span>
+  <h1>game<span style="color:var(--ac)">+</span></h1>
+  <div class="row" style="margin-left:auto;gap:6px">
+    <button class="pri" onclick="openAnimeModal()" style="padding:6px 11px;font-size:13px">+ Jeu</button>
+    <button id="und" onclick="undo()" aria-label="Annuler la dernière action" style="padding:6px 11px;font-size:13px">↩</button>
+    <button onclick="openLogModal()" style="padding:6px 11px;font-size:13px">+ Session</button>
+    <button id="thm" onclick="toggleTheme()" aria-label="Changer de thème" style="padding:6px 9px;font-size:15px"></button>
+  </div>
+</div>
+
+<main id="v"></main>
+<div id="modal"></div>
+<div id="toast"></div>
+<div id="wr"></div>
+<nav id="nav"></nav>
+
+<script>
+var KD="M22 34H78C88 34 94 42 95 54L97 70C98 78 93 84 86 84C80 84 77 80 74 76L70 70H30L26 76C23 80 20 84 14 84C7 84 2 78 3 70L5 54C6 42 12 34 22 34ZM28 46a6 6 0 1 0 0 12a6 6 0 1 0 0-12ZM70 44a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9ZM80 54a4.5 4.5 0 1 0 0 9a4.5 4.5 0 1 0 0-9Z";
+function KL(z){return '<svg width="'+z+'" height="'+z+'" viewBox="0 0 100 100" aria-label="game+"><defs><linearGradient id="kg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bbf7d0"/><stop offset=".5" stop-color="#22c55e"/><stop offset="1" stop-color="#15803d"/></linearGradient></defs><rect width="100" height="100" rx="24" fill="#07140c"/><path d="'+KD+'" fill="url(#kg)"/></svg>'}
+
+function curTheme(){return document.documentElement.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")}
+function setTheme(t){document.documentElement.setAttribute("data-theme",t);try{localStorage.setItem("kt-theme",t)}catch(e){}document.getElementById("thm").textContent=t==="dark"?"☀️":"🌙"}
+function toggleTheme(){setTheme(curTheme()==="dark"?"light":"dark")}
+(function(){var t=null;try{t=localStorage.getItem("kt-theme")}catch(e){}if(t)document.documentElement.setAttribute("data-theme",t);document.getElementById("thm").textContent=curTheme()==="dark"?"☀️":"🌙";document.getElementById("lgo").innerHTML=KL(28)})();
+
+var ST={watching:"En cours",plan:"Envie de jouer",owned:"Possédé",pause:"En pause",drop:"Abandonné",done:"Terminé"};
+var ORD=["watching","plan","owned","pause","drop","done"];
+var TY=["PC","PS5","PS4","PS3","Switch","Switch 2","3DS","Wii","Xbox","Mobile","Autre"];
+var DJ=["lun","mar","mer","jeu","ven","sam","dim"];
+var S={items:[],log:[],goal:30,prof:{name:"Joueur",av:"🎮"},bdg:{},notif:{},lists:[]};
+
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function pad(n){return String(n).padStart(2,"0")}
+function ld(d){d=d||new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function today(){return ld()}
+function hue(t){var h=0;for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))%360;return h}
+function ini(t){return esc((t||"?").split(/\s+/).slice(0,2).map(w=>w[0]||"").join("").toUpperCase())}
+function dur(it){return 60}
+function fmtH(n){var m=Math.round((Number(n)||0)*60),h=Math.floor(m/60),r=m%60;if(!h)return r+" min";return h+" h"+(r?" "+(r<10?"0":"")+r:"")}
+// Écrit une durée pour un champ de saisie : 3.5 -> "3h30", 0.5333 -> "32min"
+function fmtIn(n){var m=Math.round((Number(n)||0)*60),h=Math.floor(m/60),r=m%60;if(!m)return "";if(!h)return r+"min";return h+"h"+(r?(r<10?"0":"")+r:"")}
+// Lit une durée libre -> heures décimales. Accepte : 3h30, 3h 30, 1h, 32min, 32 min, 90m, 2:30, 1,5, 1.5, 3h30min
+function parseDur(v){
+  v=String(v==null?"":v).toLowerCase().replace(/\s+/g,"").replace(/,/g,".");
+  if(!v)return 0;
+  var m;
+  if((m=v.match(/^(\d+):(\d{1,2})$/)))return +m[1]+(+m[2])/60;
+  if((m=v.match(/^(?:(\d+(?:\.\d+)?)(?:h|heures?|hr?))?(?:(\d+(?:\.\d+)?)(?:min|mn|m)?)?$/))&&(m[1]||m[2])){
+    var h=m[1]?parseFloat(m[1]):0,mi=m[2]?parseFloat(m[2]):0;
+    if(!m[1]&&m[2]&&!/(min|mn|m)$/.test(v))return mi;
+    return h+mi/60;
+  }
+  if((m=v.match(/^(\d+(?:\.\d+)?)(?:min|mn|m)$/)))return parseFloat(m[1])/60;
+  var f=parseFloat(v);return isNaN(f)?0:f;
+}
+function setDur(id,h){var e=$(id);if(e)e.value=fmtIn(h)}
+function fmt(n){return Math.round((Number(n)||0)*100)/100}
+function toast(m){var t=$("toast");t.textContent=m;t.className="show";setTimeout(()=>{t.className=""},3000)}
+function byId(id){return S.items.find(i=>String(i.id)===String(id))}
+function dlBlob(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+
+function canonEp(s){return Number(s.ep)||0}
+function advance(s,n){var p=Math.round(((Number(s.ep)||0)+n)*10000)/10000;return{pos:p,n:n}}
+// Calcul global des épisodes et de la saison active
+function getAnimeStats(it){
+  if(it.seasons && it.seasons.length > 0){
+    var totalEp = 0, watchedEp = 0;
+    var activeSeason = it.seasons[0];
+    for(var s of it.seasons){
+      totalEp += Number(s.total)||0;
+      watchedEp += canonEp(s);
+      if((Number(s.ep)||0) < (Number(s.total)||1e9) && !activeSeason){
+        activeSeason = s;
+      }
+    }
+    // Trouver la saison en cours (la première non terminée)
+    var curr = it.seasons.find(s => (Number(s.ep)||0) < (Number(s.total)||1e9)) || it.seasons[it.seasons.length-1];
+    return {
+      ep: curr ? Number(curr.ep)||0 : watchedEp,
+      total: curr ? Number(curr.total)||0 : totalEp,
+      seasonLabel: curr ? (curr.name || `Partie ${curr.num}`) : "",
+      totalWatched: watchedEp
+    };
+  }
+  return { ep: Number(it.ep)||0, total: Number(it.total)||0, seasonLabel: it.seasonLabel||"", totalWatched: Number(it.ep)||0 };
+}
+
+function epDisp(it){
+  var st = getAnimeStats(it);
+  return (st.seasonLabel ? st.seasonLabel + " · " : "") + fmtH(st.ep);
+}
+
+function cnt(arr){var o={};arr.forEach(x=>{o[x]=(o[x]||0)+1});return Object.keys(o).map(k=>[k,o[k]]).sort((a,b)=>b[1]-a[1])}
+function flat(its){var g=[];(its||S.items).forEach(i=>(i.genres||"").split(",").forEach(x=>{x=x.trim();if(x)g.push(x)}));return g}
+function bars(a,u){var m=a.length?a[0][1]:1;return a.map(x=>'<div class="h"><span title="'+esc(x[0])+'">'+esc(x[0])+'</span><div class="bw"><i style="width:'+Math.max(4,x[1]/m*100)+'%"></i></div><span class="mu">'+x[1]+(u||"")+'</span></div>').join("")}
+function avg(l){var r=l.filter(i=>i.rating);return r.length?(r.reduce((s,i)=>s+Number(i.rating),0)/r.length).toFixed(1):"–"}
+function colBars(a,lab){var mx=Math.max(1,...a);return `<div class="hist">${a.map((v,i)=>`<div style="height:${Math.max(3,v/mx*100)}%"><span>${lab[i]}</span></div>`).join("")}</div>`}
+
+function dayMap(){var m={};S.log.forEach(x=>{m[x.d]=(m[x.d]||0)+x.n});return m}
+function streaks(){var m=dayMap(),ds=Object.keys(m).filter(d=>m[d]>0).sort(),best=0,run=0,pv=null;ds.forEach(d=>{run=(pv&&new Date(d)-new Date(pv)===864e5)?run+1:1;if(run>best)best=run;pv=d});
+ var cur=0,dt=new Date();if(!(m[ld(dt)]>0))dt.setDate(dt.getDate()-1);while(m[ld(dt)]>0){cur++;dt.setDate(dt.getDate()-1)}
+ return{cur:cur,best:best,max:Math.max.apply(null,[0].concat(Object.keys(m).map(k=>m[k])))}}
+
+function bil(P){
+  var L=S.log.filter(x=>x.d&&x.d.indexOf(P)===0&&x.n>0),per={},day={},mins=0,eps=0;
+  L.forEach(x=>{
+    var it=byId(x.id);
+    if(!it)return;
+    per[x.id]=(per[x.id]||0)+x.n;
+    day[x.d]=(day[x.d]||0)+x.n;
+    eps+=x.n;
+    mins+=x.n*dur(it);
+  });
+  var arr=Object.keys(per).map(k=>[byId(k),per[k]]).sort((a,b)=>b[1]-a[1]);
+  var fin=S.items.filter(i=>(i.fin||"").indexOf(P)===0);
+  var added=S.items.filter(i=>(i.added||"").indexOf(P)===0&&!i.old);
+  var seen=arr.map(a=>a[0]);
+  fin.forEach(i=>{if(seen.indexOf(i)<0)seen.push(i)});
+  return{day:day,eps:Math.round(eps*10)/10,mins:mins,arr:arr,fin:fin,added:added,seen:seen,gs:cnt(flat(arr.map(a=>a[0]))),stu:cnt(arr.map(a=>a[0].studio).filter(Boolean)),best:seen.filter(i=>i.rating).sort((a,b)=>b.rating-a.rating)[0],days:Object.keys(day).filter(d=>d>0).length}
+}
+function mlabel(m){return new Date(+m.slice(0,4),+m.slice(5)-1,1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"})}
+function pm(m){var d=new Date(+m.slice(0,4),+m.slice(5)-2,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
+function period(){return bm==="m"?{P:month,l:mlabel(month)}:{P:String(year),l:String(year)}}
+
+// Compression d'image
+function compressImageFile(file, maxW, maxH, quality){
+  return new Promise((resolve, reject)=>{
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        var ratio = Math.min(maxW / w, maxH / h, 1);
+        var cw = Math.round(w * ratio), ch = Math.round(h * ratio);
+        var canvas = document.createElement("canvas");
+        canvas.width = cw; canvas.height = ch;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, cw, ch);
+        resolve(canvas.toDataURL("image/jpeg", quality || 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImg(u){
+  return new Promise(r=>{
+    if(!u) return r(null);
+    var done=false, fin=v=>{if(!done){done=true;r(v)}};
+    var i=new Image();
+    if(!u.startsWith("data:")) i.crossOrigin="anonymous";
+    i.onload=()=>fin(i);
+    i.onerror=()=>{
+      if(!u.startsWith("data:")){
+        var i2=new Image();
+        i2.onload=()=>fin(i2);
+        i2.onerror=()=>fin(null);
+        i2.src=u;
+      } else fin(null);
+    };
+    i.src=u;
+    setTimeout(()=>fin(null),8000);
+  });
+}
+
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+var FCOND='Anton,Impact,"Arial Narrow Bold","Arial Narrow",sans-serif',FSANS='Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+function spT(x,t,px,py,sz,w,col,sp){x.font=w+" "+sz+"px "+FSANS;x.fillStyle=col;x.textAlign="left";var cx=px;for(const ch of t){x.fillText(ch,cx,py);cx+=x.measureText(ch).width+sp}}
+function dc(x,im,a,b,w,h,t){if(im){var sc=Math.max(w/im.width,h/im.height),dw=im.width*sc,dh=im.height*sc;x.drawImage(im,a+(w-dw)/2,b+(h-dh)/2,dw,dh)}else{x.fillStyle="hsl("+hue(t)+",55%,35%)";x.fillRect(a,b,w,h);x.fillStyle="#fff";x.font="800 "+Math.round(w/3)+"px "+FSANS;x.textAlign="center";x.fillText(t.slice(0,2).toUpperCase(),a+w/2,b+h/2+w/10)}}
+
+async function mkStory(P,label){
+ try{await Promise.all([document.fonts.load("150px Anton"),document.fonts.load("700 36px Inter"),document.fonts.load("800 36px Inter")])}catch(e){}
+ var B=bil(P),c=document.createElement("canvas");c.width=1080;c.height=1920;var x=c.getContext("2d"),yr=P.length===4,top=B.arr.slice(0,6),imgs=await Promise.all(top.map(a=>loadImg(a[0].cover)));
+ x.fillStyle="#070709";x.fillRect(0,0,1080,1920);x.fillStyle="#16a34a";x.beginPath();x.arc(1000,80,380,0,Math.PI*2);x.fill();
+ x.save();x.translate(64,58);x.scale(.78,.78);x.fillStyle="#07140c";x.beginPath();if(x.roundRect)x.roundRect(0,0,100,100,24);else x.rect(0,0,100,100);x.fill();var lgr=x.createLinearGradient(0,0,100,100);lgr.addColorStop(0,"#bbf7d0");lgr.addColorStop(.5,"#22c55e");lgr.addColorStop(1,"#15803d");x.fillStyle=lgr;x.fill(new Path2D(KD));x.restore();
+ x.font="700 33px "+FSANS;x.fillStyle="#fff";x.textAlign="left";x.fillText("game",158,108);var lw=x.measureText("game").width;x.fillStyle="#22c55e";x.fillText("+",158+lw,108);
+ spT(x,String(S.prof.name||"").toUpperCase().slice(0,16),64,228,36,"800","#86efac",7);
+ var mo=yr?P:new Date(+P.slice(0,4),+P.slice(5)-1,1).toLocaleDateString("fr-FR",{month:"long"}).toUpperCase(),l1="MON "+mo,l2="GAMING",fs=150;
+ x.font=fs+"px "+FCOND;var asc=x.measureText("H").actualBoundingBoxAscent||fs*.72;fs=Math.round(fs*112/asc);x.font=fs+"px "+FCOND;var w1=x.measureText(l1).width;if(w1>930){fs=Math.floor(fs*930/w1);x.font=fs+"px "+FCOND}
+ x.fillStyle="#F3EFE8";x.textAlign="left";x.fillText(l1,64,362);x.fillText(l2,64,486);
+ var t0=top[0];x.save();x.translate(192,745);x.rotate(-3*Math.PI/180);x.shadowColor="rgba(0,0,0,.7)";x.shadowBlur=50;x.shadowOffsetY=22;rr(x,-133,-185,266,370,16);x.fillStyle="#1b1b20";x.fill();x.shadowColor="transparent";rr(x,-133,-185,266,370,16);x.clip();
+ if(t0)dc(x,imgs[0],-133,-185,266,370,t0[0].title);else{x.fillStyle="#26262d";x.fillRect(-133,-185,266,370)}x.restore();
+ spT(x,yr?"JEU DE L’ANNÉE":"JEU DU MOIS",369,688,28,"700","#8d8d98",5);
+ var tt=t0?t0[0].title:"Aucun jeu",ts=56;x.font="800 "+ts+"px "+FSANS;while(x.measureText(tt).width>640&&ts>30){ts-=2;x.font="800 "+ts+"px "+FSANS}x.fillStyle="#fff";x.fillText(tt,369,756);
+ x.font="500 36px "+FSANS;x.fillStyle="#c9c9d2";x.fillText(t0?fmt(t0[1])+" h jouées":"Ajoute tes heures de jeu",369,816);
+ x.font="150px "+FCOND;var a2=x.measureText("H").actualBoundingBoxAscent||108,ns=Math.round(150*80/a2);
+ function tile(a,b,bg,fg,num,lb){x.fillStyle=bg;rr(x,a,b,468,188,34);x.fill();x.fillStyle=fg;x.textAlign="left";var n=String(num),px=a+35;if(n[0]==="+"){x.font="800 "+Math.round(ns*.62)+"px "+FSANS;x.fillText("+",px,b+108);px+=x.measureText("+").width+4;n=n.slice(1)}x.font=ns+"px "+FCOND;x.fillText(n,px,b+108);x.font="700 38px "+FSANS;x.fillText(lb,a+35,b+157)}
+ var ne=B.eps,ns2=B.arr.length;
+ tile(64,995,"#16a34a","#fff",ne,"heures jouées");tile(548,995,"#17171c","#fff",B.days,B.days>1?"jours de jeu":"jour de jeu");
+ tile(64,1205,"#17171c","#fff","+"+B.added.length,"en collection");tile(548,1205,"#F1ECE4","#15151a",ns2,ns2>1?"jeux joués":"jeu joué");
+ var nr=B.seen.filter(i=>i.rating).length;x.fillStyle="#052e16";rr(x,64,1445,952,100,36);x.fill();x.fillStyle="#fff";x.font="66px "+FCOND;x.textAlign="left";x.fillText(nr+" NOTE"+(nr>1?"S":""),99,1520);
+ spT(x,"MES "+ns2+" JEU"+(ns2>1?"X":""),64,1630,30,"700","#8d8d98",6);
+ var shown=ns2>6?5:Math.min(6,top.length);
+ for(var i=0;i<shown;i++){var cx=64+i*154;x.save();rr(x,cx,1660,140,200,12);x.clip();dc(x,imgs[i],cx,1660,140,200,top[i][0].title);x.restore()}
+ if(ns2>6){var cx2=64+5*154;x.fillStyle="#17171c";rr(x,cx2,1660,140,200,12);x.fill();x.fillStyle="#fff";x.font="52px "+FCOND;x.textAlign="center";x.fillText("+"+(ns2-5),cx2+70,1775)}
+ return c}
+
+async function refreshStory(){var t=++stok,p=period();try{var c=await mkStory(p.P,p.l);if(t!==stok||!$("sc"))return;c.style.cssText="width:100%;max-width:340px;border-radius:16px;display:block;margin:auto";$("sc").innerHTML="";$("sc").appendChild(c);SC_=c}catch(e){if($("sc"))$("sc").textContent="Image indisponible."}}
+function shareStory(){if(!SC_)return;SC_.toBlob(async b=>{var f=new File([b],"bilan-game-plus.png",{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"Mon bilan gaming"})}catch(e){}return}dlBlob(b,"bilan-game-plus.png")})}
+function dlStory(){if(SC_)SC_.toBlob(b=>dlBlob(b,"bilan-game-plus.png"))}
+
+// Wrapped Slides
+var WB="#16a34a",WL="#86efac",DN=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+function wrOpen(){var p=period();wr={i:0,P:p.P,l:p.l,m:bm,B:bil(p.P)};$("wr").className="on";wrDraw()}
+function wrClose(){wr=null;$("wr").className="";$("wr").innerHTML="";if(tab==="bilan")render()}
+function wrGo(d){if(!wr)return;var i=wr.i+d;if(i<0)return;if(i>=SL.length){wrClose();return}wr.i=i;wrDraw()}
+function pl(n,a,b){return n>1?b:a}
+function mname(w){return w.m==="m"?new Date(+w.P.slice(0,4),+w.P.slice(5)-1,1).toLocaleDateString("fr-FR",{month:"long"}):w.P}
+function kick(t,c){return `<div class="kk2 pp" style="color:${c||"#fff"}">${t}</div>`}
+function cov(it,w,h,r){return `<div style="width:${w}px;height:${h}px;border-radius:${r||9}px;flex:none;background:${gr(it)};position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">${it.cover?`<img src="${esc(it.cover)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:ini(it.title)}</div>`}
+var LOGO='<div style="display:flex;align-items:center;gap:10px">'+KL(38)+'<b style="font-size:22px">game<span style="color:#22c55e">+</span></b></div>';
+
+function w1(w){var nm=mname(w).toUpperCase(),el=w.m==="m"?(/^[AEIOUH]/.test(nm)?"D’":"DE "):"";
+ return ["#0b0b10",`<div style="position:absolute;right:-140px;top:-150px;width:400px;height:400px;border-radius:50%;background:${WB};pointer-events:none"></div><div style="position:relative;flex:1;display:flex;flex-direction:column"><div style="margin-top:-30px">${LOGO}</div><div class="kk2 pp" style="color:${WL};margin-top:64px;animation-delay:.1s">${esc(String(S.prof.name||"").toUpperCase().slice(0,18))}</div><div class="cd pp" style="font-size:78px;margin:12px 0 0;animation-delay:.2s">TON BILAN<br>${w.m==="m"?el+esc(nm):esc(nm)}</div><p class="pp" style="animation-delay:.4s;font-size:18px;color:#b6bccd;margin-top:22px;line-height:1.4">Ton ${w.m==="m"?"mois":"année"} en gaming, en quelques slides.<br>Appuie sur « Suivant » pour commencer.</p></div>`]}
+function w2(w){var B=w.B,ks=Object.keys(B.day).sort((a,b)=>B.day[b]-B.day[a]),wd=[0,0,0,0,0,0,0];ks.forEach(k=>{wd[(new Date(k+"T12:00:00").getDay()+6)%7]+=B.day[k]});var fw=wd.indexOf(Math.max(...wd)),mk=ks[0],cal="";
+ if(w.m==="m"){var y=+w.P.slice(0,4),m=+w.P.slice(5)-1,dim=new Date(y,m+1,0).getDate(),first=(new Date(y,m,1).getDay()+6)%7;cal=["L","M","M","J","V","S","D"].map(d=>`<div style="text-align:center;font-weight:800;font-size:13px">${d}</div>`).join("");for(var i=0;i<first;i++)cal+="<div></div>";
+  for(var d=1;d<=dim;d++){var k=w.P+"-"+pad(d),v=B.day[k]||0,mx=k===mk;cal+=`<div class="cell" style="${mx?"background:#fff;color:"+WB:v>0?"background:#ffffff55;color:#052e16":""}">${d}</div>`}}
+ else{var mo=[];for(var q=1;q<=12;q++)mo.push(bil(w.P+"-"+pad(q)).eps);var mm=Math.max(...mo);cal=mo.map((v,i)=>`<div class="cell" style="flex-direction:column;font-size:11px;${v&&v===mm?"background:#fff;color:"+WB:v?"background:#ffffff55;color:#052e16":""}">${["jan","fév","mar","avr","mai","juin","juil","août","sep","oct","nov","déc"][i]}<b>${v}</b></div>`).join("")}
+ return [WB,`${kick("EN "+esc(mname(w).toUpperCase())+", TU AS JOUÉ")}<div class="row" style="align-items:flex-end;gap:10px;flex-wrap:nowrap;margin-top:4px"><div class="cd pp" style="font-size:140px;line-height:.86;animation-delay:.1s" data-to="${B.eps}">0</div><div class="cd pp" style="font-size:36px;padding-bottom:10px;animation-delay:.2s">${pl(B.eps,"ÉPISODE","ÉPISODES")}</div></div>`+
+ (B.eps?`<p class="pp" style="font-size:17px;margin:6px 0;animation-delay:.3s">sur ${B.arr.length} jeu${pl(B.arr.length,"","x")} différent${pl(B.arr.length,"","s")}, en ${B.days} jour${pl(B.days,"","s")}.</p><p class="pp" style="font-size:16px;margin:0 0 14px;animation-delay:.35s">Record : le ${w.m==="m"?+mk.slice(8):new Date(mk+"T12:00:00").toLocaleDateString("fr-FR",{day:"numeric",month:"long"})} (${fmt(B.day[mk])} h).</p>`:`<p style="font-size:18px">Aucune session enregistrée sur cette période.</p>`)+
+ `<div class="sbx pp" style="background:#00000030;animation-delay:.4s"><div style="display:grid;grid-template-columns:repeat(${w.m==="m"?7:4},1fr);gap:6px">${cal}</div></div>`]}
+function w3(w){var B=w.B,t=B.arr[0],bg="radial-gradient(120% 55% at 50% -5%,#16a34a70,transparent 70%),#08080d";if(!t)return[bg,`${kick("TON JEU DU MOIS",WL)}<p style="margin-top:40px;font-size:18px">Aucune session enregistrée sur cette période.</p>`];
+ var it=t[0],n=t[1],st=getAnimeStats(it),pc=st.total?Math.min(100,st.ep/st.total*100):0,fin=st.total&&st.ep>=st.total,fs=it.title.length>26?28:it.title.length>16?36:48;
+ return[bg,`${kick(w.m==="m"?"TON JEU DU MOIS":"TON JEU DE L’ANNÉE",WL)}<div class="pp" style="margin:18px auto 0;width:58%;aspect-ratio:2/3;border-radius:16px;background:${gr(it)};position:relative;overflow:hidden;transform:rotate(2deg);box-shadow:0 24px 50px #000a;animation-delay:.15s;flex:none">${it.cover?`<img src="${esc(it.cover)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:""}</div><div class="cd pp" style="font-size:${fs}px;margin-top:20px;animation-delay:.25s;color:#fff">${esc(it.title)}</div><p class="pp" style="font-size:17px;margin:8px 0 12px;animation-delay:.35s"><b>${fmt(n)} h</b> jouées ${w.m==="m"?"ce mois-ci":"cette année"}.</p><div class="bar2 pp" style="animation-delay:.4s"><i style="width:${pc}%"></i></div><div class="row pp" style="justify-content:space-between;color:#9bb5a4;font-size:14px;margin-top:8px;animation-delay:.45s"><span>${fmt(st.ep)} / ${st.total||"?"} h</span><span>${fin?"terminé":st.total?(st.total-st.ep)+" restant"+pl(st.total-st.ep,"","s"):"en cours"}</span></div>`]}
+function w4(w){var B=w.B,a=B.arr.slice(0,5),n=B.arr.length;
+ return["#15151c",`${kick(w.m==="m"?"TES JEUX DU MOIS":"TES JEUX DE L’ANNÉE",WL)}<div class="cd pp" style="font-size:60px;margin:6px 0 20px;animation-delay:.1s">${n} JEU${pl(n,"","X")}<br>JOUÉ${pl(n,"","S")}</div>`+(a.length?a.map((x,k)=>`<div class="rk pp" style="animation-delay:${.15+k*.1}s"><div class="cd" style="font-size:38px;width:42px;text-align:center;flex:none;color:${k?"#3b3f52":"#22c55e"}">${k+1}</div>${cov(x[0],56,80)}<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x[0].title)}</div><div style="color:#8e93a4;font-size:14px">${fmt(x[1])} h</div></div></div>`).join(""):'<p style="color:#8e93a4">Aucun jeu sur cette période.</p>')]}
+function w5(w){var n=S.items.filter(i=>(i.added||"").indexOf(w.P)===0&&!i.old),fin=n.filter(i=>i.status==="done").length;
+ return[WB,`${kick("TU AS COMMENCÉ")}<div class="row" style="align-items:flex-end;gap:10px;flex-wrap:nowrap"><div class="cd pp" style="font-size:150px;line-height:.86;animation-delay:.1s" data-to="${n.length}">0</div><div class="cd pp" style="font-size:34px;padding-bottom:10px;animation-delay:.2s">${pl(n.length,"NOUVEAU<br>JEU","NOUVEAUX<br>JEUX")}</div></div>`+(n.length?`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px">${n.slice(0,6).map((it,k)=>`<div class="pp" style="animation-delay:${.3+k*.08}s"><div style="aspect-ratio:2/3;border-radius:12px;background:${gr(it)};position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px">${it.cover?`<img src="${esc(it.cover)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`:ini(it.title)}</div><div style="font-size:11px;margin-top:4px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(it.title)}</div></div>`).join("")}</div>`:`<p style="font-size:18px;margin-top:20px">Ajoute de nouveaux jeux depuis le bouton « + Jeu ».</p>`)]}
+function w6(w){var B=w.B,r=B.seen.filter(i=>i.rating).sort((a,b)=>b.rating-a.rating),n=r.length;
+ return["#15151c",`${kick("TES NOTES",WL)}<div class="cd pp" style="font-size:60px;margin:6px 0 20px;animation-delay:.1s">${n} JEU${pl(n,"","X")}<br>NOTÉ${pl(n,"","S")}</div>`+(n?r.slice(0,5).map((it,k)=>`<div class="rk pp" style="animation-delay:${.15+k*.1}s">${cov(it,56,80)}<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(it.title)}</div><div class="star" style="font-size:18px">${"★".repeat(Math.floor(it.rating))}${it.rating%1?"½":""}<span style="color:#3b3f52">${"★".repeat(5-Math.ceil(it.rating))}</span></div></div></div>`).join(""):'<p style="color:#8e93a4;font-size:16px">Note tes jeux depuis leur fiche pour les retrouver ici.</p>')]}
+function w7(w){var s=streaks();
+ return[WB,`${kick("TON RYTHME")}<div class="row" style="align-items:flex-end;gap:10px;flex-wrap:nowrap"><div class="cd pp" style="font-size:150px;line-height:.86;animation-delay:.1s" data-to="${s.best}">0</div><div class="cd pp" style="font-size:34px;padding-bottom:10px;animation-delay:.2s">JOURS<br>D’AFFILÉE</div></div><p class="pp" style="font-size:18px;margin:10px 0;animation-delay:.3s">Ta plus longue série de jours consécutifs. Série actuelle : ${s.cur} jour${pl(s.cur,"","s")}.</p>`]}
+function w8(){return["#08080d",`${kick("TON BILAN EN UNE IMAGE",WL)}<div id="wsc" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin:12px 0;color:#9bb5a4">Création de l’image…</div><div class="row" style="justify-content:center"><button class="pri" style="background:${WB}" onclick="shareStory()">📤 Partager</button><button style="background:#ffffff1f;color:#fff;border:0" onclick="dlStory()">⬇️ Télécharger</button></div>`]}
+var SL=[w1,w2,w3,w4,w5,w6,w7,w8];
+function wrDraw(){var w=wr,i=w.i,r=SL[i](w),bar="";for(var k=0;k<SL.length;k++)bar+=`<i class="${k<=i?"d":""}"></i>`;
+ $("wr").innerHTML=`<div class="ws"><div class="sl" style="background:${r[0]}">${r[1]}</div><div class="wp">${bar}</div><button class="wx" onclick="wrClose()" aria-label="Fermer">✕</button><div class="wn"><button onclick="wrGo(-1)" style="${i?"":"visibility:hidden"}">←</button><button class="nx" onclick="wrGo(1)">${i===SL.length-1?"Terminer":"Suivant →"}</button></div></div>`;
+ $("wr").querySelectorAll("[data-to]").forEach(countUp);fitCd();if(SL[i]===w8)wrImg()}
+function countUp(el){var to=+el.getAttribute("data-to"),t0=Date.now();(function f(){var k=Math.min(1,Math.max(0,(Date.now()-t0-250)/700));el.textContent=Math.round(to*k*(2-k)*10)/10;if(k<1)requestAnimationFrame(f);else fitCd()})()}
+function fitCd(){try{var r=$("wr");if(!r)return;r.querySelectorAll(".cd").forEach(k=>{var g=0;while(g++<30 && k.scrollWidth>k.clientWidth+1){var fs=parseFloat(getComputedStyle(k).fontSize)||36;k.style.fontSize=Math.max(20,fs*.92)+"px"}})}catch(e){}}
+async function wrImg(){var w=wr;if(!w)return;try{var c=await mkStory(w.P,w.l);if(!wr||SL[wr.i]!==w8||!$("wsc"))return;c.style.cssText="max-height:100%;max-width:100%;border-radius:16px;box-shadow:0 10px 40px #0008";$("wsc").innerHTML="";$("wsc").appendChild(c);SC_=c}catch(e){}}
+
+var tab="animes",bm="m",month=ld().slice(0,7),year=new Date().getFullYear(),am=ld().slice(0,7),cmode="m",cy=year,sd=ld(),stok=0,SC_=null,wr=null,filterSt="all",searchQ="";
+function SK(){return "gamaz_v1"}
+function blank(){return{items:[],log:[],goal:30,prof:{name:"Joueur",av:"🎮"},bdg:{},notif:{},lists:[]}}
+function norm(){
+  S.items=S.items||[]; S.log=S.log||[]; S.lists=S.lists||[]; S.goal=S.goal||30; S.prof=S.prof||{name:"Joueur",av:"🎮"};
+  // Migration automatique des anciens formats vers le multi-saisons
+  S.items.forEach(it => {
+    if(!it.seasons || !Array.isArray(it.seasons)){
+      it.seasons = [{
+        num: 1,
+        name: it.seasonLabel || "Jeu principal",
+        ep: Number(it.ep)||0,
+        total: Number(it.total)||0
+      }];
+    }
+  });
+}
+function loadS(){
+  S=blank();
+  try{
+    var r=localStorage.getItem(SK());
+    if(r)Object.assign(S,JSON.parse(r));
+  }catch(e){}
+  norm();
+}
+var HIST=[],LAST=null,noHist=false,fbUser=null,pushT;
+function save(){S.t=Date.now();var js=JSON.stringify(S);
+  if(!noHist&&LAST){HIST.push(LAST);if(HIST.length>25)HIST.shift()}
+  LAST=js;
+  try{localStorage.setItem(SK(),js)}catch(e){toast("⚠️ Stockage plein ! Exporte tes données.")}
+  cloudPush()}
+function cloudPush(){if(!fbUser||!window.KC)return;clearTimeout(pushT);pushT=setTimeout(function(){KC.push().catch(function(){toast("☁️ Sync impossible (données trop lourdes ? utilise des liens pour les images)")})},1500)}
+function undo(){if(!HIST.length){toast("Rien à annuler");return}
+  S=Object.assign(blank(),JSON.parse(HIST.pop()));norm();noHist=true;save();noHist=false;render();toast("↩ Action annulée")}
+function updUndo(){var b=$("und");if(b){b.disabled=!HIST.length}}
+function gr(it){var h=hue(it.title||"");return "linear-gradient(135deg,hsl("+h+",65%,45%),hsl("+(h+50)+",70%,30%))"}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function cardR(it, sub, showQuickAdd){
+  var st = getAnimeStats(it);
+  var epText = sub || (st.total ? `⏱ ${fmtH(st.ep)} / ${fmtH(st.total)}` : `⏱ ${fmtH(st.ep)} jouées`);
+  var pct = st.total ? Math.min(100, Math.round(st.ep / st.total * 100)) : 0;
+  return `<div class="card x" onclick="openAnimeModal('${esc(it.id)}')">
+    <div class="cov" style="background:${gr(it)}">
+      <span class="ini">${ini(it.title)}</span>
+      ${it.cover ? `<img src="${esc(it.cover)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+      ${it.fav ? "<em>❤️</em>" : ""}
+      ${st.seasonLabel ? `<small>${esc(st.seasonLabel)}</small>` : (it.rating ? `<small>★ ${it.rating}</small>` : "")}
+      <div class="ov"><span class="big2">${esc(epText)}</span></div>
+    </div>
+    <div class="bd">
+      <div>
+        <b title="${esc(it.title)}">${esc(it.title)}</b>
+        ${st.total ? `<div class="bar"><i style="width:${pct}%"></i></div>` : ""}
+        <div class="mu" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ST[it.status]||"")}${it.type?" · "+esc(it.type):""}${it.rating?" · ★ "+it.rating:""}${it.genres ? " · "+esc(it.genres) : ""}</div>
+      </div>
+      ${showQuickAdd ? `<button class="pri" style="width:100%;padding:6px;font-size:12px;margin-top:4px" onclick="event.stopPropagation();openLogModal('${esc(it.id)}')">+ Temps</button>` : ""}
+    </div>
+  </div>`;
+}
+
+// Incrémente l'épisode dans la saison active en cours
+function quickEp(id, delta){
+  var it = byId(id);
+  if(!it || !it.seasons || !it.seasons.length) return;
+  // Trouver la saison active (première non finie)
+  var activeSeason = it.seasons.find(s => (Number(s.ep)||0) < (Number(s.total)||1e9)) || it.seasons[it.seasons.length-1];
+  var adv = advance(activeSeason, delta), newEp = adv.pos, diff = adv.n, moved = newEp !== (Number(activeSeason.ep)||0);
+  if(diff === 0 && !moved){ toast("Saison déjà au maximum ("+activeSeason.total+" ép.)"); return; }
+  
+  activeSeason.ep = newEp;
+  if(!it.started && newEp > 0) it.started = today();
+  
+  // Vérifier si toutes les saisons sont finies
+  var allDone = false;
+  if(allDone){ it.status = "done"; it.fin = today(); }
+  else if(it.status === "plan" && newEp > 0){ it.status = "watching"; }
+  
+  S.log.push({ id: it.id, d: today(), n: diff, e: newEp, t: Date.now() });
+  save();
+  render();
+  var st = getAnimeStats(it);
+  toast(`+1 h · ${it.title} (${fmtH(newEp)} au total)`);
+}
+
+// Modale d'édition des saisons
+var tempCover = "", tempSeasons = [], curId = "";
+function openAnimeModal(id){
+  var it = id ? byId(id) : null; curId = id||"";
+  tempCover = it ? (it.cover || "") : "";
+  tempSeasons = it && it.seasons ? JSON.parse(JSON.stringify(it.seasons)) : [
+    { num: 1, name: "Jeu principal", ep: 0, total: 0 }
+  ];
+  var isNew = !it;
+  var d = it || {
+    title: "", type: "PC", status: "watching",
+    rating: 0, genres: "", studio: "", fav: false
+  };
+
+  renderAnimeModalHtml(isNew, d);
+}
+
+function renderAnimeModalHtml(isNew, d){
+  var seasonsHtml = tempSeasons.map((s, idx) => `
+    <div class="season-row">
+      <input type="text" placeholder="Nom (ex: Jeu principal, DLC 1)" value="${esc(s.name||('Saison '+s.num))}" oninput="tempSeasons[${idx}].name=this.value">
+      <input type="text" inputmode="text" placeholder="Temps joué (ex: 3h30)" value="${fmtIn(s.ep)}" oninput="tempSeasons[${idx}].ep=Math.max(0,parseDur(this.value))">
+      <input type="text" inputmode="text" placeholder="Pour finir (ex: 40h)" value="${fmtIn(s.total)}" oninput="tempSeasons[${idx}].total=Math.max(0,parseDur(this.value))">
+      <button type="button" class="danger" onclick="removeSeason(${idx})" title="Supprimer cette partie" style="padding:6px 0;font-size:14px">✕</button>
+    </div>
+  `).join("");
+
+  $("modal").innerHTML = `<div class="mod" onclick="if(event.target===this)closeModal()">
+    <div>
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <h3 style="font-size:18px">${isNew ? "✨ Nouveau jeu" : "✏️ Modifier le jeu"}</h3>
+        <button onclick="closeModal()" style="padding:5px 10px">✕</button>
+      </div>
+
+      <div class="row" style="gap:12px;margin-bottom:14px;align-items:flex-start;flex-wrap:nowrap">
+        <div id="m_prev" class="prev-img" style="background:${gr(d)}">
+          ${tempCover ? `<img src="${esc(tempCover)}">` : ini(d.title||"AN")}
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+          <span class="mu" style="font-weight:700;color:var(--tx)">Image de couverture (PC & Mobile)</span>
+          <input type="file" id="m_file" accept="image/*" hidden onchange="handleCoverUpload(this)">
+          <div class="row">
+            <button type="button" class="pri" onclick="$('m_file').click()" style="font-size:12px;padding:6px 10px">📁 Choisir sur l'appareil</button>
+            ${tempCover ? `<button type="button" onclick="clearCover()" style="font-size:12px;padding:6px 10px">Retirer</button>` : ""}
+          </div>
+          <input type="url" id="m_url" placeholder="Ou coller un lien d'image (https://...)" value="${tempCover && !tempCover.startsWith('data:') ? esc(tempCover) : ''}" oninput="updateCoverUrl(this.value)" style="font-size:12px;padding:6px 9px">
+        </div>
+      </div>
+
+      <form onsubmit="saveAnimeForm(event, '${isNew ? "" : esc(d.id)}')" class="f">
+        <label class="w">Titre du jeu *
+          <input id="f_title" required placeholder="Ex: Elden Ring, Zelda..." value="${esc(d.title)}">
+        </label>
+
+        <label>⏱ Temps déjà joué (ex: 3h30, 45min)
+          <input id="f_h" type="text" placeholder="ex: 12h30" value="${fmtIn(tempSeasons.reduce((a,s)=>a+(Number(s.ep)||0),0))}">
+        </label>
+        <label>🎯 Pour finir (optionnel)
+          <input id="f_t" type="text" placeholder="ex: 40h" value="${fmtIn(tempSeasons[0]&&tempSeasons[0].total)}">
+        </label>
+
+        <label class="w">📅 Jour où j'ai joué (pour les heures ajoutées)
+          <input id="f_date" type="date" value="${today()}" max="${today()}">
+        </label>
+
+        <label>Statut
+          <select id="f_status">
+            ${ORD.map(k=>`<option value="${k}" ${d.status===k?"selected":""}>${ST[k]}</option>`).join("")}
+          </select>
+        </label>
+        <label>Plateforme
+          <select id="f_type">
+            ${TY.map(t=>`<option value="${t}" ${d.type===t?"selected":""}>${t}</option>`).join("")}
+          </select>
+        </label>
+
+        <label>Note (0 à 5 ★)
+          <select id="f_rat">
+            <option value="0" ${!d.rating?"selected":""}>Non noté</option>
+            ${[.5,1,1.5,2,2.5,3,3.5,4,4.5,5].map(n=>`<option value="${n}" ${Number(d.rating)===n?"selected":""}>${n} ★</option>`).join("")}
+          </select>
+        </label>
+        <input id="f_dur" type="hidden" value="60">
+
+        <label class="w">Genres (séparés par des virgules)
+          <input id="f_gen" placeholder="RPG, Action, Aventure..." value="${esc(d.genres||"")}">
+        </label>
+        <label>Studio / Dév.
+          <input id="f_stu" placeholder="Ex: FromSoftware, Nintendo..." value="${esc(d.studio||"")}">
+        </label>
+        <label class="w">📝 Avis / notes
+          <textarea id="f_rev" rows="4" placeholder="Ton avis sur le jeu…" style="width:100%;resize:vertical">${esc(d.review||"")}</textarea>
+        </label>
+        <label style="justify-content:center">
+          <span style="display:flex;align-items:center;gap:6px;margin-top:14px;cursor:pointer;color:var(--tx);font-size:13px">
+            <input id="f_fav" type="checkbox" ${d.fav?"checked":""} style="width:18px;height:18px"> ❤️ Coup de cœur
+          </span>
+        </label>
+
+        <label class="w" style="flex-direction:row;align-items:center;gap:8px;color:var(--tx);font-size:12px"><input id="f_old" type="checkbox" ${d.old?"checked":""} style="width:16px;height:16px"> 🕹️ Déjà joué avant (ne pas compter comme nouveau dans ma collection)</label>
+        ${isNew ? `<label class="w" style="background:var(--c2);padding:9px;border-radius:12px;border:1px solid var(--bd)">
+          <span style="display:flex;align-items:center;gap:8px;color:var(--tx);font-size:12px">
+            <input id="f_autolog" type="checkbox" style="width:16px;height:16px">
+            Compter ces heures dans mon bilan, au jour choisi ci-dessus (laisse décoché si tu y as joué avant)
+          </span>
+        </label>` : ""}
+
+        <div class="w row" style="justify-content:space-between;margin-top:8px">
+          ${!isNew ? `<button type="button" class="danger" onclick="deleteAnime('${esc(d.id)}')">🗑️ Supprimer</button>` : "<span></span>"}
+          <div class="row">
+            <button type="button" onclick="closeModal()">Annuler</button>
+            <button type="submit" class="pri">💾 Enregistrer</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function formState(){var v=function(i){return $(i)?$(i).value:""},c=function(i){return $(i)&&$(i).checked};
+  return{id:curId,title:v("f_title"),status:v("f_status")||"watching",type:v("f_type")||"PC",rating:parseFloat(v("f_rat"))||0,dur:+v("f_dur")||24,genres:v("f_gen"),studio:v("f_stu"),fav:c("f_fav"),old:c("f_old")}}
+function addSeason(){var d=formState();var n=tempSeasons.length+1;tempSeasons.push({num:n,name:"DLC "+(n-1),ep:0,total:5});renderAnimeModalHtml(!curId,d)}
+function removeSeason(idx){if(tempSeasons.length<=1){toast("Il faut au moins une partie !");return}var d=formState();tempSeasons.splice(idx,1);renderAnimeModalHtml(!curId,d)}
+
+async function handleCoverUpload(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  toast("Optimisation de l'image...");
+  try {
+    tempCover = await compressImageFile(file, 450, 650, 0.82);
+    $("m_prev").innerHTML = `<img src="${tempCover}">`;
+    $("m_url").value = "";
+    toast("Image prête !");
+  } catch(e) {
+    toast("Erreur lors du chargement de l'image");
+  }
+}
+function updateCoverUrl(val){
+  tempCover = val.trim();
+  $("m_prev").innerHTML = tempCover ? `<img src="${esc(tempCover)}" onerror="this.remove()">` : "AN";
+}
+function clearCover(){
+  tempCover = "";
+  $("m_prev").innerHTML = "AN";
+  $("m_url").value = "";
+}
+function closeModal(){ $("modal").innerHTML = ""; }
+
+function saveAnimeForm(e, id){
+  e.preventDefault();
+  var title = $("f_title").value.trim();
+  if(!title) return;
+  var status = $("f_status").value;
+  var pd = ($("f_date")&&$("f_date").value)||today();
+
+  tempSeasons = [{ num: 1, name: "Jeu principal", ep: Math.max(0, parseDur($("f_h").value)), total: Math.max(0, parseDur($("f_t").value)) }];
+  var totalWatched = tempSeasons.reduce((s, x) => s + canonEp(x), 0);
+  var allDone = false;
+  if(allDone && status === "watching") status = "done";
+
+  var data = {
+    title: title,
+    seasons: tempSeasons,
+    status: status,
+    type: $("f_type").value,
+    dur: Math.max(1, parseInt($("f_dur").value, 10) || 24),
+    rating: parseFloat($("f_rat").value) || 0,
+    genres: $("f_gen").value.trim(),
+    studio: $("f_stu").value.trim(),
+    review: $("f_rev") ? $("f_rev").value.trim() : "",
+    fav: $("f_fav").checked,
+    old: $("f_old").checked,
+    cover: tempCover
+  };
+
+  if(id){
+    var it = byId(id);
+    if(it){
+      var oldStats = getAnimeStats(it);
+      Object.assign(it, data);
+      if(status === "done" && !it.fin) it.fin = today();
+      var newStats = getAnimeStats(it);
+      if(newStats.totalWatched > oldStats.totalWatched){
+        var diff = newStats.totalWatched - oldStats.totalWatched;
+        S.log.push({ id: it.id, d: pd, n: diff, e: newStats.ep, t: Date.now() });
+      }
+    }
+    toast("Jeu mis à jour !");
+  } else {
+    var newId = uid();
+    var item = Object.assign({
+      id: newId,
+      added: today(),
+      started: totalWatched > 0 ? pd : "",
+      fin: status === "done" ? today() : ""
+    }, data);
+    S.items.unshift(item);
+    var autoLog = $("f_autolog") && $("f_autolog").checked;
+    if(autoLog && totalWatched > 0){
+      S.log.push({ id: newId, d: pd, n: totalWatched, e: getAnimeStats(item).ep, t: Date.now() });
+    }
+    toast("Jeu ajouté !");
+  }
+  save();
+  closeModal();
+  render();
+}
+
+function deleteAnime(id){
+  if(!confirm("Supprimer ce jeu et son historique ?")) return;
+  S.items = S.items.filter(i => String(i.id) !== String(id));
+  S.log = S.log.filter(l => String(l.id) !== String(id));
+  save();
+  closeModal();
+  render();
+  toast("Jeu supprimé");
+}
+
+function openLogModal(preselectedId){
+  if(!S.items.length){
+    toast("Ajoute d'abord un jeu !");
+    openAnimeModal();
+    return;
+  }
+  var opts = S.items.map(i => {
+    var st = getAnimeStats(i);
+    return `<option value="${esc(i.id)}" ${String(i.id)===String(preselectedId)?"selected":""}>${esc(i.title)} (${st.seasonLabel || 'Jeu'}) — [${fmtH(st.ep)}/${st.total?fmtH(st.total):"?"}]</option>`;
+  }).join("");
+  $("modal").innerHTML = `<div class="mod" onclick="if(event.target===this)closeModal()">
+    <div>
+      <div class="row" style="justify-content:space-between;margin-bottom:12px">
+        <h3 style="font-size:18px">🎮 Enregistrer une session</h3>
+        <button onclick="closeModal()" style="padding:5px 10px">✕</button>
+      </div>
+      <form onsubmit="saveLogForm(event)" class="f">
+        <label class="w">Jeu / Partie
+          <select id="l_anime">${opts}</select>
+        </label>
+        <label class="w">⏱ Temps joué (ex: 32 min, 3h30, 1h15)
+          <input id="l_n" type="text" value="1h" placeholder="ex: 32 min ou 3h30" autocomplete="off" required>
+          <span class="row" style="margin-top:6px;gap:6px">
+            ${[[0.25,"15 min"],[0.5,"30 min"],[1,"1 h"],[2,"2 h"],[3,"3 h"]].map(q=>`<button type="button" style="padding:5px 9px;font-size:12px" onclick="setDur('l_n',${q[0]})">${q[1]}</button>`).join("")}
+          </span>
+        </label>
+        <label>Date
+          <input id="l_date" type="date" value="${sd || today()}" required>
+        </label>
+        <div class="w row" style="justify-content:flex-end;margin-top:8px">
+          <button type="button" onclick="closeModal()">Annuler</button>
+          <button type="submit" class="pri">✅ Valider dans le bilan</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function saveLogForm(e){
+  e.preventDefault();
+  var id = $("l_anime").value;
+  var rawN = String($("l_n").value).trim(), n = parseDur(rawN);
+  if(/^\d+$/.test(rawN) && +rawN >= 10) n = (+rawN)/60; // "45" seul = 45 minutes
+  if(!(n>0)){ toast("Entre un temps valide (ex: 32 min, 3h30)"); return; }
+  var d = $("l_date").value || today();
+  var it = byId(id);
+  if(!it || !it.seasons || !it.seasons.length) return;
+
+  // Ajouter les épisodes sur la saison active en cours
+  var activeSeason = it.seasons.find(s => (Number(s.ep)||0) < (Number(s.total)||1e9)) || it.seasons[it.seasons.length-1];
+  var adv = advance(activeSeason, n), newEp = adv.pos, realAdded = adv.n;
+  if(!realAdded && newEp === (Number(activeSeason.ep)||0)){ toast("Saison déjà au maximum"); return; }
+
+  activeSeason.ep = newEp;
+  if(!it.started) it.started = d;
+  
+  var allDone = false;
+  if(allDone){ it.status = "done"; it.fin = d; }
+  else if(it.status === "plan"){ it.status = "watching"; }
+
+  S.log.push({ id: it.id, d: d, n: realAdded, e: newEp, t: Date.now() });
+  sd = d;
+  am = month = d.slice(0,7);
+  cy = year = +d.slice(0,4);
+  save();
+  closeModal();
+  render();
+  toast(`+${fmtH(realAdded)} ajouté pour ${it.title} !`);
+}
+
+function vAnimes(){
+  if(!S.items.length){
+    return `<div class="panel" style="text-align:center;padding:30px 16px;margin-top:14px">
+      <div style="font-size:44px">🎮</div>
+      <h3>Ta collection est vide</h3>
+      <p class="mu">Ajoute tes jeux et suis tes heures de jeu.</p>
+      <div class="row" style="justify-content:center;margin-top:12px">
+        <button class="pri" onclick="openAnimeModal()">+ Ajouter mon premier jeu</button>
+      </div>
+    </div>`;
+  }
+  var list = S.items.filter(it => {
+    var matchSt = filterSt === "all" || it.status === filterSt;
+    var matchQ = !searchQ || (it.title||"").toLowerCase().includes(searchQ.toLowerCase()) || (it.genres||"").toLowerCase().includes(searchQ.toLowerCase());
+    return matchSt && matchQ;
+  });
+  var counts = { all: S.items.length };
+  ORD.forEach(k => counts[k] = S.items.filter(i => i.status === k).length);
+
+  return `
+    <div class="panel" style="margin:10px 0;padding:10px 14px;display:flex;justify-content:space-between;align-items:center"><span class="mu">⏱ Temps de jeu total</span><b style="font-size:18px">${fmtH(S.items.reduce((a,i)=>a+getAnimeStats(i).totalWatched,0))}</b></div>
+    <div class="row" style="margin:10px 0">
+      <input type="search" placeholder="🔍 Rechercher un jeu, un genre..." value="${esc(searchQ)}" oninput="searchQ=this.value;render()" style="flex:1;min-width:180px">
+    </div>
+    <div class="row" style="overflow-x:auto;flex-wrap:nowrap;padding-bottom:6px;margin-bottom:8px">
+      <button class="${filterSt==='all'?'on':''}" onclick="filterSt='all';render()" style="white-space:nowrap;font-size:12px">Tous (${counts.all})</button>
+      ${ORD.map(k => `<button class="${filterSt===k?'on':''}" onclick="filterSt='${k}';render()" style="white-space:nowrap;font-size:12px">${ST[k]} (${counts[k]})</button>`).join("")}
+    </div>
+    ${list.length ? `<div class="grid">${list.map(it => cardR(it, null, true)).join("")}</div>` : `<div class="panel mu" style="text-align:center">Aucun jeu dans ce filtre.</div>`}
+  `;
+}
+
+function buildDI(){var m={};S.log.forEach(x=>{if(x.n<=0)return;var it=byId(x.id);if(!it)return;var d=m[x.d]=m[x.d]||{};var r=d[x.id]=d[x.id]||{it:it,n:0,hi:0,t:0};r.n+=x.n;if(x.e)r.hi=Math.max(r.hi,x.e);if(x.t>r.t)r.t=x.t});var o={};Object.keys(m).forEach(k=>{o[k]=Object.keys(m[k]).map(i=>m[k][i]).sort((a,b)=>b.n-a.n)});return o}
+
+function vCal(){
+  var DI=buildDI(),dm={};Object.keys(DI).forEach(k=>{dm[k]=DI[k].reduce((s,r)=>s+r.n,0)});
+  var ctl=`<div class="row" style="margin:8px 0"><button class="${cmode==="m"?"on":""}" onclick="cmode='m';render()">Mois</button><button class="${cmode==="y"?"on":""}" onclick="cmode='y';render()">Année</button><button onclick="openLogModal()" style="margin-left:auto;font-size:12px">+ Logger ici</button></div>`;
+  if(cmode==="y"){var B=bil(String(cy)),mx=Math.max(1,...Object.keys(dm).filter(k=>k.slice(0,4)==cy).map(k=>dm[k])),h="";
+   for(var k=0;k<12;k++){var P=cy+"-"+pad(k+1),dim=new Date(cy,k+1,0).getDate(),f=(new Date(cy,k,1).getDay()+6)%7,c="",e=0;for(var i=0;i<f;i++)c+="<i style='background:none'></i>";
+    for(var d=1;d<=dim;d++){var v=dm[P+"-"+pad(d)]||0;e+=v;c+=v?`<i class="on" style="opacity:${.4+.6*v/mx}"></i>`:"<i></i>"}
+    h+=`<div class="panel ym" onclick="am='${P}';cmode='m';render()"><div class="row"><b style="text-transform:capitalize;flex:1">${new Date(cy,k,1).toLocaleDateString("fr-FR",{month:"long"})}</b><span class="mu">${fmt(e)} h</span></div><div class="mg">${c}</div></div>`}
+   return ctl+`<div class="row" style="margin:8px 0"><button onclick="cy--;render()">‹</button><b style="flex:1;text-align:center">${cy}</b><button onclick="cy++;render()">›</button></div><div class="kpi k4"><div><b>${B.eps} h</b>de jeu</div><div><b>${B.arr.length}</b>jeux joués</div><div><b>${B.days}</b>jours actifs</div><div><b>${B.fin.length}</b>terminés</div></div><h2>Mois par mois</h2><div class="yg">${h}</div>`+(B.arr.length?`<h2>Les plus joués de ${cy}</h2><div class="rh">${B.arr.slice(0,10).map(a=>cardR(a[0],fmt(a[1])+" h")).join("")}</div>`:"")}
+  var y=+am.slice(0,4),m=+am.slice(5)-1,dim=new Date(y,m+1,0).getDate(),first=(new Date(y,m,1).getDay()+6)%7,cells=DJ.map(d=>`<div class="hd">${d}</div>`).join("");
+  for(var i=0;i<first;i++)cells+="<div></div>";
+  for(var d=1;d<=dim;d++){
+    var k=am+"-"+pad(d),L=DI[k];
+    if(L){
+      var tot=dm[k], topIt=L[0].it;
+      cells+=`<div class="dy w ${k===sd?"sel":""} ${k===today()?"td":""}" style="background:${gr(topIt)}" onclick="sd='${k}';render()">
+        ${topIt.cover?`<img class="bg" src="${esc(topIt.cover)}" alt="">`:""}
+        <b>${d}</b><span>${tot}</span>${L.length>1?`<i>+${L.length-1}</i>`:""}
+      </div>`;
+    } else {
+      cells+=`<div class="dy e ${k===sd?"sel":""} ${k===today()?"td":""}" onclick="sd='${k}';render()"><b>${d}</b></div>`;
+    }
+  }
+  var gl=DI[sd]||[],tot=gl.reduce((s,r)=>s+r.n,0),mins=gl.reduce((s,r)=>s+r.n*dur(r.it),0),B2=bil(am);
+  return ctl+`<div class="row" style="margin:8px 0"><button onclick="am=pm(am);render()">‹</button><b style="text-transform:capitalize;flex:1;text-align:center">${mlabel(am)}</b><button onclick="var d=new Date(${y},${m+1},1);am=d.getFullYear()+'-'+pad(d.getMonth()+1);render()">›</button></div><div class="kpi k4" style="margin-bottom:10px"><div><b>${B2.eps} h</b>de jeu</div><div><b>${B2.arr.length}</b>jeux joués</div><div><b>${B2.days}</b>jours actifs</div><div><b>${B2.fin.length}</b>terminés</div></div><div class="panel"><div class="cw">${cells}</div></div>`+
+  `<h2>${new Date(sd+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</h2><div class="panel">`+(gl.length?`<div class="mu" style="margin-bottom:6px">${fmt(tot)} h de jeu</div>`+gl.map(r=>`<div class="ev" style="cursor:pointer" onclick="openAnimeModal('${esc(r.it.id)}')"><div class="t" style="background:${gr(r.it)}">${r.it.cover?`<img src="${esc(r.it.cover)}">`:""}</div><div style="flex:1"><b>${esc(r.it.title)}</b><div class="mu">+${fmt(r.n)} h</div></div><span class="pill">+${fmt(r.n)}</span></div>`).join(""):'<p class="mu">Rien joué ce jour-là.</p>')+`</div>`+(B2.arr.length?`<h2>Vu en ${mlabel(am)}</h2><div class="rh">${B2.arr.map(a=>cardR(a[0],fmt(a[1])+" h")).join("")}</div>`:"")
+}
+
+function vBilan(){var p=period(),B=bil(p.P),y=bm==="m"?+month.slice(0,4):year;
+ var ctl=`<div class="row" style="margin:8px 0"><button class="${bm==="m"?"on":""}" onclick="bm='m';render()">Mois</button><button class="${bm==="y"?"on":""}" onclick="bm='y';render()">Année</button><span style="margin-left:auto"></span>${bm==="m"?`<input type="month" value="${month}" onchange="month=this.value||month;render()">`:`<input type="number" style="width:90px" value="${year}" onchange="year=+this.value||year;render()">`}</div>`,extra="";
+ if(bm==="m"){var P2=bil(pm(month)),pct=Math.min(100,Math.round(B.eps/S.goal*100)),df=B.eps-P2.eps;extra=`<div class="kpi" style="margin-top:10px"><div><b>${df>=0?"+":""}${df}</b>vs mois précédent</div><div><b>${pct}%</b>objectif (${S.goal})</div></div><div class="bar" style="height:9px;margin:8px 0"><i style="width:${pct}%"></i></div>`}
+ else{var yr=[];for(var k=1;k<=12;k++)yr.push(bil(y+"-"+pad(k)).eps);extra=`<h2>Mois par mois</h2><div class="panel">${colBars(yr,"JFMAMJJASOND".split(""))}</div>`}
+ var top=B.seen.filter(i=>i.rating).sort((a,b)=>b.rating-a.rating).slice(0,5);
+ return ctl+`<button class="pri" style="width:100%;padding:14px;font-size:16px;font-weight:700;background:linear-gradient(135deg,#16a34a,#0B2A8F)" onclick="wrOpen()">▶ Lancer mon bilan gaming</button><div class="wrap"><span style="text-transform:capitalize;opacity:.85;font-size:13px">${p.l}</span><b>${fmt(B.eps)} h de jeu</b><div style="font-size:13px;opacity:.9">${B.fin.length} terminé(s) · ${B.added.length} ajouté(s)${B.arr[0]?" · Top : "+esc(B.arr[0][0].title):""}</div></div>`+
+ `<h2>📲 Ma story</h2><div class="panel"><div id="sc" class="mu" style="text-align:center">Création de l’image…</div><div class="row" style="margin-top:10px;justify-content:center"><button class="pri" onclick="shareStory()">📤 Partager</button><button onclick="dlStory()">⬇️ Télécharger</button></div></div>`+
+ `<div class="kpi k4"><div><b>${B.days}</b>jours actifs</div><div><b>${avg(B.seen)} ★</b>note moy.</div><div><b>${B.gs.length}</b>genres joués</div><div><b>${B.fin.length}</b>terminés</div></div>`+extra+
+ `<h2>Les plus joués</h2><div class="panel">${B.arr.length?bars(B.arr.slice(0,6).map(a=>[a[0].title,a[1]])," h"):'<span class="mu">Aucune session enregistrée sur cette période.</span>'}</div>`+(B.gs.length?`<h2>Genres</h2><div class="panel">${bars(B.gs.slice(0,6))}</div>`:"")+(B.stu.length?`<h2>Studios</h2><div class="panel">${bars(B.stu.slice(0,5))}</div>`:"")+(B.fin.length?`<h2>✅ Terminés</h2><div class="rh">${B.fin.map(i=>cardR(i)).join("")}</div>`:"")+(top.length?`<h2>⭐ Mieux notés</h2><div class="rh">${top.map(i=>cardR(i)).join("")}</div>`:"")}
+
+function accPanel(){
+ if(!window.KC)return '<div class="panel"><b>☁️ Compte</b><p class="mu">Cloud non configuré (colle ta firebaseConfig dans le code) ou en cours de chargement.</p></div>';
+ if(fbUser)return '<div class="panel"><b>☁️ '+esc(fbUser.email||"Connecté")+'</b><p class="mu">Tes données sont synchronisées automatiquement.</p><button onclick="KC.out()">Se déconnecter</button></div>';
+ return '<div class="panel"><b>☁️ Compte</b><p class="mu">Connecte-toi pour retrouver ta collection sur tous tes appareils.</p><div class="row"><input id="ae" type="email" placeholder="Email" style="flex:1"><input id="ap" type="password" placeholder="Mot de passe (6+)" style="flex:1"></div><div class="row" style="margin-top:8px"><button class="pri" onclick="KC.auth(\'in\')">Connexion</button><button onclick="KC.auth(\'up\')">Créer un compte</button><button onclick="KC.google()">Google</button></div></div>'}
+function vData(){var n=S.items.length;return accPanel()+`
+  <div class="panel">
+    <b>👤 Mon profil</b>
+    <div class="row" style="margin-top:8px">
+      <input type="text" value="${esc(S.prof.name)}" placeholder="Ton pseudo" onchange="S.prof.name=this.value||'Joueur';save();toast('Pseudo enregistré')">
+    </div>
+  </div>
+  <div class="panel">
+    <b>🎯 Objectif mensuel</b>
+    <div class="row" style="margin-top:8px">
+      <input type="number" min="1" style="width:90px" value="${S.goal}" onchange="S.goal=+this.value||30;save();toast('Objectif enregistré')">
+      <span class="mu">heures par mois</span>
+    </div>
+  </div>
+  <div class="panel">
+    <b>📥 Sauvegarde & Transfert</b>
+    <p class="mu">${n?n+" jeux · "+S.log.length+" entrées d’historique":"Aucune donnée."}</p>
+    <input id="fi" type="file" accept=".json,application/json" hidden onchange="imp(this)">
+    <div class="row">
+      <button class="pri" onclick="exp()" ${n?"":"disabled"}>⬇️ Exporter (.json)</button>
+      <button onclick="$('fi').click()">📥 Importer (.json)</button>
+    </div>
+  </div>
+  ${S.lists.length?`<div class="panel"><b>📋 Mes listes</b>${S.lists.map(l=>{var its=(l.ids||[]).map(byId).filter(Boolean),tag=l.ranked?"ol":"ul";return `<details style="margin-top:8px"><summary style="cursor:pointer">${esc(l.title)} <span class="mu">· ${its.length} jeux</span></summary><${tag} style="margin:8px 0 0;padding-left:22px;line-height:1.7">${its.map(i=>`<li style="cursor:pointer" onclick="openAnimeModal('${esc(i.id)}')">${esc(i.title)}</li>`).join("")}</${tag}></details>`}).join("")}</div>`:""}
+  <div class="panel">
+    <b>🧹 Tout effacer</b>
+    <button class="danger" onclick="wipe()">Effacer mes données</button>
+  </div>`}
+
+function wipe(){if(!confirm("Effacer toutes les données ?"))return;S=blank();save();render();toast("Données effacées (↩ pour annuler)")}
+function exp(){dlBlob(new Blob([JSON.stringify(S)],{type:"application/json"}),"game-plus-sauvegarde-"+today()+".json")}
+
+// ===== Import Loadia (export "Mes données" .json) =====
+var LPF={pc:"PC",switch:"Switch","switch-2":"Switch 2",switch2:"Switch 2","3ds":"3DS",wii:"Wii",ps5:"PS5",ps4:"PS4",ps3:"PS3",xbox:"Xbox","xbox-one":"Xbox","xbox-series":"Xbox",mobile:"Mobile",android:"Mobile",ios:"Mobile"};
+var LST={backlog:"plan",wishlist:"plan",owned:"owned",playing:"watching",played:"done",completed:"done",paused:"pause",abandoned:"drop",dropped:"drop"};
+function isLoadia(o){return o&&!Array.isArray(o)&&Array.isArray(o.library)&&(o.app==="Loadia"||Array.isArray(o.diary))}
+function slugTitle(id){
+  var POS={luigis:"Luigi's",marvels:"Marvel's",bowsers:"Bowser's",diddys:"Diddy's",kirbys:"Kirby's",lets:"Let's",majoras:"Majora's",yoshis:"Yoshi's",assassins:"Assassin's",drakes:"Drake's"};
+  var UP={hd:1,dx:1,ost:1,vr:1,ii:1,iii:1,iv:1,vi:1,vii:1,viii:1,ix:1,xi:1,xii:1,xiii:1,xiv:1,xv:1,xvi:1};
+  var LOW={of:1,the:1,and:1,in:1,to:1,a:1,an:1,for:1,on:1,at:1,vs:1};
+  id=String(id||"");
+  if(/^nier-replicant/.test(id))return"NieR Replicant ver.1.22474487139";
+  var w=id.split("-");
+  if(w.length>1&&/^\d{5,}$/.test(w[w.length-1]))w.pop();
+  var out=[];
+  for(var i=0;i<w.length;i++){var x=w[i],nx=w[i+1];
+    if(x==="pok"&&nx==="mon"){out.push("Pokémon");i++;continue}
+    if(x==="steins"&&nx==="gate"){out.push("Steins;Gate");i++;continue}
+    if(x==="links"&&nx==="awakening"){out.push("Link's");continue}
+    if(x==="demons"&&nx==="souls"){out.push("Demon's");continue}
+    if(POS[x]&&x!=="lets"||x==="lets"){out.push(POS[x]);continue}
+    if(UP[x]){out.push(x.toUpperCase());continue}
+    if(i>0&&LOW[x]){out.push(x);continue}
+    out.push(x.charAt(0).toUpperCase()+x.slice(1));
+  }
+  return out.join(" ")}
+function importLoadia(o){
+  var fav={};(o.favorites||[]).forEach(function(g){fav[g]=1});
+  var hype={};(o.hype||[]).forEach(function(h){if(h&&h.gameId)hype[h.gameId]=h.value});
+  var cur={};((o.localSnapshot&&o.localSnapshot.currentlyPlaying)||[]).forEach(function(g){cur[g]=1});
+  var dia={};(o.diary||[]).forEach(function(e){var p=dia[e.gameId];if(!p||String(e.date)>String(p.date))dia[e.gameId]=e;});
+  var have={};S.items.forEach(function(i){have[String(i.id)]=1});
+  var add=0,dup=0,withTime=0,mins=0,gids={};
+  var lib=o.library.slice().sort(function(a,b){return String(b.updatedAt||"").localeCompare(String(a.updatedAt||""))});
+  lib.forEach(function(g){
+    if(!g||!g.gameId)return;
+    gids[g.gameId]=1;
+    if(have[g.gameId]){dup++;return}
+    var st=LST[String(g.status||"").toLowerCase()]||"plan";
+    if(g.completed)st="done";
+    var d=dia[g.gameId]||{};
+    var pf=(g.platforms||d.platforms||[]).map(function(p){return LPF[String(p).toLowerCase()]||String(p)});
+    var m=Number(g.playtimeMinutes)||0;if(m){withTime++;mins+=m}
+    var added=String(g.addedAt||"").slice(0,10)||today();
+    var it={
+      id:g.gameId,loadiaId:g.gameId,title:slugTitle(g.gameId),status:st,
+      type:pf[0]||"PC",platforms:pf,rating:Number(g.rating)||0,fav:!!(g.liked||fav[g.gameId]),
+      genres:"",studio:"",dur:60,review:g.review?String(g.review):"",spoiler:!!g.spoiler,
+      replays:Number(g.replayCount)||0,completed:!!g.completed,hype:hype[g.gameId]||0,
+      nowPlaying:!!cur[g.gameId],added:added,
+      started:String(d.startedAt||"").slice(0,10)||(m?added:""),
+      fin:st==="done"?(String(d.finishedAt||"").slice(0,10)||String(d.date||g.updatedAt||"").slice(0,10)):"",
+      seasons:[{num:1,name:"Jeu principal",ep:Math.round(m/60*10000)/10000,total:0}]
+    };
+    S.items.push(it);have[g.gameId]=1;add++;
+  });
+  var nl=0;
+  (o.lists||[]).forEach(function(l){
+    if(!l||!l.id||S.lists.some(function(x){return x.id===l.id}))return;
+    S.lists.push({id:l.id,title:l.title||"Liste",ids:(l.gameIds||[]).filter(function(g){return have[g]}),ranked:!!l.ranked});nl++;
+  });
+  if(o.account&&o.account.displayName&&(!S.prof||!S.prof.name||S.prof.name==="Joueur"))S.prof=Object.assign({},S.prof,{name:o.account.displayName});
+  return{add:add,dup:dup,lists:nl,withTime:withTime,hours:Math.round(mins/60)}
+}
+
+// Import tolérant : accepte le .json de game+ ET d'autres formats (tableau direct, items/games/jeux/animes, noms de champs variés)
+function pick(o,keys){for(var k of keys){if(o[k]!==undefined&&o[k]!==null&&o[k]!=="")return o[k]}return undefined}
+function toHours(v){if(typeof v==="number")return v;return parseDur(v)}
+function stMap(v){v=String(v||"").toLowerCase();
+  if(ST[v])return v;
+  if(/(termin|fini|done|complet|finish|beaten|100)/.test(v))return"done";
+  if(/(abandon|drop|arr[eê]t)/.test(v))return"drop";
+  if(/(pause|hold|suspend)/.test(v))return"pause";
+  if(/(plan|envie|wish|backlog|todo|[àa] faire|want)/.test(v))return"plan";
+  return"watching"}
+function convItem(it){
+  if(!it||typeof it!=="object")return null;
+  var title=pick(it,["title","titre","name","nom","game","jeu"]);if(!title)return null;
+  var o=Object.assign({},it);
+  o.id=String(pick(it,["id","uid","_id"])||uid());
+  o.title=String(title);
+  var cv=pick(it,["cover","image","img","poster","thumbnail","icon","pochette"]);if(cv)o.cover=String(cv);
+  o.status=stMap(pick(it,["status","statut","state","etat"]));
+  var rt=parseFloat(pick(it,["rating","note","score","rate"]));o.rating=isNaN(rt)?0:rt;
+  var gn=pick(it,["genres","genre","tags","categories"]);o.genres=Array.isArray(gn)?gn.join(", "):(gn?String(gn):"");
+  var stu=pick(it,["studio","developer","developpeur","dev","editeur"]);if(stu)o.studio=String(stu);
+  o.fav=!!pick(it,["fav","favorite","favori","favorit","liked"]);
+  if(!o.started){var sd_=pick(it,["started","start","debut","startedAt"]);if(sd_)o.started=String(sd_).slice(0,10)}
+  if(!o.fin){var fd=pick(it,["fin","finished","end","finishedAt","completedAt"]);if(fd)o.fin=String(fd).slice(0,10)}
+  if(!o.added)o.added=today();
+  if(Array.isArray(it.seasons)&&it.seasons.length){
+    o.seasons=it.seasons.map(function(x,i){return{num:Number(x.num)||i+1,name:x.name||x.nom||x.title||("Partie "+(i+1)),ep:toHours(pick(x,["ep","hours","heures","playtime","time","temps"])||0),total:toHours(pick(x,["total","toFinish","pourFinir","main"])||0)}})
+  }else{
+    delete o.seasons;
+    o.seasons=[{num:1,name:it.seasonLabel||"Jeu principal",ep:toHours(pick(it,["ep","hours","heures","playtime","playTime","time","temps","hoursPlayed","played"])||0),total:toHours(pick(it,["total","toFinish","hoursToFinish","main","mainStory"])||0)}]
+  }
+  return o}
+function convImport(o){
+  var arr=Array.isArray(o)?o:pick(o,["items","games","jeux","animes","library","collection","list","data"]);
+  if(arr&&!Array.isArray(arr)&&Array.isArray(arr.items))arr=arr.items;
+  if(!Array.isArray(arr))throw 0;
+  var items=arr.map(convItem).filter(Boolean);if(!items.length)throw 0;
+  var ids={};items.forEach(function(i){ids[i.id]=1});
+  var log=(!Array.isArray(o)&&Array.isArray(o.log)?o.log:[]).filter(function(l){return l&&l.d&&ids[String(l.id)]}).map(function(l){return Object.assign({},l,{id:String(l.id),n:Number(l.n)||0})});
+  var base=Array.isArray(o)?{}:o;
+  return Object.assign(blank(),base,{items:items,log:log})}
+function imp(el){var f=el.files[0];if(!f)return;var r=new FileReader();r.onload=()=>{try{var o=JSON.parse(r.result);if(isLoadia(o)){var rs=importLoadia(o);norm();save();tab="animes";filterSt="all";render();toast("Loadia : "+rs.add+" jeux importés"+(rs.dup?" ("+rs.dup+" déjà présents)":"")+" · "+rs.lists+" liste(s) · "+rs.hours+" h")}else{S=convImport(o);norm();save();tab="animes";render();toast("Import réussi · "+S.items.length+" jeux")}}catch(e){toast("Fichier invalide")}el.value=""};r.readAsText(f)}
+
+function nav(){$("nav").innerHTML=[["animes","🎮","Jeux"],["cal","📆","Calendrier"],["bilan","📊","Bilan"],["data","⚙️","Réglages"]].map(t=>`<button class="${tab===t[0]?"on":""}" onclick="tab='${t[0]}';render();window.scrollTo(0,0)"><span>${t[1]}</span>${t[2]}</button>`).join("")}
+function render(){var y=window.scrollY;updUndo();nav();$("v").innerHTML={animes:vAnimes,cal:vCal,bilan:vBilan,data:vData}[tab]();window.scrollTo(0,y);if(tab==="bilan"&&S.items.length)refreshStory()}
+
+loadS();LAST=JSON.stringify(S);render();
+</script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import{getFirestore,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// ⬇️ COLLE ICI TA CONFIG FIREBASE (Paramètres du projet > Tes applications > Web)
+const cfg={apiKey:"AIzaSyCmoNLwt9F9tq4Jo8Py-pJJMiuIBINWX20",authDomain:"kitaku-e2667.firebaseapp.com",projectId:"kitaku-e2667",storageBucket:"kitaku-e2667.firebasestorage.app",messagingSenderId:"669149087468",appId:"1:669149087468:web:2cd8c8817e17d9edd847c9"};
+{
+ const app=initializeApp(cfg),au=getAuth(app),db=getFirestore(app),err=e=>toast("❌ "+(e.code||e.message));
+ window.KC={
+  auth:m=>(m==="up"?createUserWithEmailAndPassword:signInWithEmailAndPassword)(au,$("ae").value,$("ap").value).catch(err),
+  google:()=>signInWithPopup(au,new GoogleAuthProvider()).catch(err),
+  out:()=>signOut(au),
+  push:()=>setDoc(doc(db,"gamaz",au.currentUser.uid),{data:JSON.stringify(S),t:S.t})
+ };
+ onAuthStateChanged(au,async u=>{fbUser=u;
+  if(u){try{const s=await getDoc(doc(db,"gamaz",u.uid));
+   if(s.exists()&&s.data().t>(S.t||0)){S=Object.assign(blank(),JSON.parse(s.data().data));norm();noHist=true;save();noHist=false;toast("☁️ Données synchronisées")}
+   else if(S.items.length)await KC.push()}catch(e){err(e)}}
+  render()});
+}
+</script></body></html>
